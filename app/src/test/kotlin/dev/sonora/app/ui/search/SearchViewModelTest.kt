@@ -86,8 +86,9 @@ class SearchViewModelTest {
     fun `successful search exposes results`() = runTest(dispatcher) {
         val catalog = FakeCatalog(ApiResult.Success(listOf(track)))
         val viewModel = viewModel(catalog)
+        val rawQuery = "  norah   jones "
 
-        viewModel.onQueryChange("  norah   jones ")
+        viewModel.onQueryChange(rawQuery)
         viewModel.submit()
         advanceUntilIdle()
 
@@ -95,7 +96,7 @@ class SearchViewModelTest {
         assertEquals(LoadStatus.CONTENT, state.status)
         assertEquals(1, state.tracks.size)
         assertEquals("Don't Know Why", state.tracks.first().title)
-        assertEquals("norah   jones ", state.query, "the raw query is preserved for the text field")
+        assertEquals(rawQuery, state.query, "the raw query is preserved for the text field")
         assertEquals("norah jones", catalog.lastQuery, "the provider receives a normalised query")
     }
 
