@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dev.sonora.app.data.CatalogSession
 import dev.sonora.app.data.UserPreferences
 import dev.sonora.app.ui.LoadStatus
+import dev.sonora.core.domain.YouTubeKeyResolution
 import dev.sonora.core.domain.FavoritesRepository
 import dev.sonora.core.domain.SearchRepository
 import dev.sonora.core.model.ApiResult
@@ -42,11 +43,12 @@ class SearchViewModel(
     private val preferences: UserPreferences,
     private val catalogSession: CatalogSession,
     isOnline: StateFlow<Boolean>,
+    youTubeKey: StateFlow<YouTubeKeyResolution>,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
         SearchUiState(
-            capabilities = searchRepository.capabilities(),
+            capabilities = SearchCapabilities(youTube = youTubeKey.value.availability),
             isOffline = !isOnline.value,
         ),
     )
@@ -58,6 +60,12 @@ class SearchViewModel(
         }
         viewModelScope.launch {
             preferences.lastProvider.collect { provider -> _state.update { it.copy(provider = provider) } }
+        }
+        // A key pasted into Settings becomes usable without restarting the app.
+        viewModelScope.launch {
+            youTubeKey.collect { resolution ->
+                _state.update { it.copy(capabilities = SearchCapabilities(youTube = resolution.availability)) }
+            }
         }
     }
 

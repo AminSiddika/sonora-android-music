@@ -15,7 +15,8 @@ import dev.sonora.core.model.YouTubeAvailability
 class SearchRepository(
     private val catalog: CatalogSearch,
     private val videos: VideoSearch?,
-    private val youTubeAvailability: YouTubeAvailability,
+    /** Evaluated on every call so a key entered at runtime is picked up immediately. */
+    private val youTubeAvailability: () -> YouTubeAvailability,
     private val cacheTtlMillis: Long = DEFAULT_CACHE_TTL_MILLIS,
     private val clock: () -> Long = System::currentTimeMillis,
 ) {
@@ -32,7 +33,7 @@ class SearchRepository(
         clock = clock,
     )
 
-    fun capabilities(): SearchCapabilities = SearchCapabilities(youTube = youTubeAvailability)
+    fun capabilities(): SearchCapabilities = SearchCapabilities(youTube = youTubeAvailability())
 
     suspend fun searchTracks(
         rawQuery: String,
@@ -55,8 +56,8 @@ class SearchRepository(
         forceRefresh: Boolean = false,
     ): ApiResult<List<VideoItem>> {
         val query = validated(rawQuery) ?: return ApiResult.Failure(SonoraError.EmptyQuery)
-        val provider = videos ?: return ApiResult.Failure(
-            when (youTubeAvailability) {
+        val provider = videos.takeIf { youTubeAvailability().isAvailable } ?: return ApiResult.Failure(
+            when (youTubeAvailability()) {
                 YouTubeAvailability.PlaceholderKey -> SonoraError.InvalidApiKey
                 else -> SonoraError.MissingApiKey
             },

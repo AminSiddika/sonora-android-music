@@ -43,7 +43,7 @@ class SearchRepositoryTest {
     @Test
     fun `blank queries never reach the network`() = runTest {
         val catalog = RecordingCatalog()
-        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = YouTubeAvailability.MissingKey)
+        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = { YouTubeAvailability.MissingKey })
 
         val result = repository.searchTracks("   ")
 
@@ -54,7 +54,7 @@ class SearchRepositoryTest {
     @Test
     fun `queries are normalised before being sent`() = runTest {
         val catalog = RecordingCatalog()
-        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = YouTubeAvailability.MissingKey)
+        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = { YouTubeAvailability.MissingKey })
 
         repository.searchTracks("  norah    jones ")
 
@@ -64,7 +64,7 @@ class SearchRepositoryTest {
     @Test
     fun `repeat searches are served from the cache`() = runTest {
         val catalog = RecordingCatalog(ApiResult.Success(listOf(track(1))))
-        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = YouTubeAvailability.MissingKey)
+        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = { YouTubeAvailability.MissingKey })
 
         val first = repository.searchTracks("jazz")
         val second = repository.searchTracks("jazz")
@@ -76,7 +76,7 @@ class SearchRepositoryTest {
     @Test
     fun `forceRefresh bypasses the cache`() = runTest {
         val catalog = RecordingCatalog(ApiResult.Success(listOf(track(1))))
-        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = YouTubeAvailability.MissingKey)
+        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = { YouTubeAvailability.MissingKey })
 
         repository.searchTracks("jazz")
         repository.searchTracks("jazz", forceRefresh = true)
@@ -87,7 +87,7 @@ class SearchRepositoryTest {
     @Test
     fun `errors are not cached`() = runTest {
         val catalog = RecordingCatalog(ApiResult.Failure(SonoraError.RateLimited))
-        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = YouTubeAvailability.MissingKey)
+        val repository = SearchRepository(catalog, videos = null, youTubeAvailability = { YouTubeAvailability.MissingKey })
 
         repository.searchTracks("jazz")
         repository.searchTracks("jazz")
@@ -102,7 +102,7 @@ class SearchRepositoryTest {
         val repository = SearchRepository(
             catalog = catalog,
             videos = null,
-            youTubeAvailability = YouTubeAvailability.MissingKey,
+            youTubeAvailability = { YouTubeAvailability.MissingKey },
             cacheTtlMillis = 1_000,
             clock = { now },
         )
@@ -119,7 +119,7 @@ class SearchRepositoryTest {
         val repository = SearchRepository(
             catalog = RecordingCatalog(),
             videos = null,
-            youTubeAvailability = YouTubeAvailability.MissingKey,
+            youTubeAvailability = { YouTubeAvailability.MissingKey },
         )
 
         assertEquals(SonoraError.MissingApiKey, repository.searchVideos("tiny desk").errorOrNull())
@@ -130,7 +130,7 @@ class SearchRepositoryTest {
         val repository = SearchRepository(
             catalog = RecordingCatalog(),
             videos = null,
-            youTubeAvailability = YouTubeAvailability.PlaceholderKey,
+            youTubeAvailability = { YouTubeAvailability.PlaceholderKey },
         )
 
         assertEquals(SonoraError.InvalidApiKey, repository.searchVideos("tiny desk").errorOrNull())
@@ -144,7 +144,7 @@ class SearchRepositoryTest {
         val repository = SearchRepository(
             catalog = RecordingCatalog(),
             videos = videos,
-            youTubeAvailability = YouTubeAvailability.Available,
+            youTubeAvailability = { YouTubeAvailability.Available },
         )
 
         val result = repository.searchVideos("tiny desk")
@@ -159,7 +159,7 @@ class SearchRepositoryTest {
         val repository = SearchRepository(
             catalog = RecordingCatalog(),
             videos = null,
-            youTubeAvailability = YouTubeAvailability.MissingKey,
+            youTubeAvailability = { YouTubeAvailability.MissingKey },
         )
 
         val capabilities = repository.capabilities()
@@ -167,5 +167,29 @@ class SearchRepositoryTest {
         assertTrue(capabilities.isAvailable(dev.sonora.core.model.SearchProvider.ITUNES))
         assertTrue(!capabilities.isAvailable(dev.sonora.core.model.SearchProvider.YOUTUBE))
         assertNull(capabilities.youTube.let { if (it is YouTubeAvailability.Available) it else null })
+    }
+
+    @Test
+    fun `capabilities follow the availability provider at runtime`() = runTest {
+        var availability: YouTubeAvailability = YouTubeAvailability.MissingKey
+        val videos = RecordingVideoSearch(
+            ApiResult.Success(listOf(VideoItem(videoId = "abc", title = "A video", channelTitle = "Channel"))),
+        )
+        val repository = SearchRepository(
+            catalog = RecordingCatalog(),
+            videos = videos,
+            youTubeAvailability = { availability },
+        )
+
+        assertTrue(!repository.capabilities().isAvailable(dev.sonora.core.model.SearchProvider.YOUTUBE))
+        assertEquals(SonoraError.MissingApiKey, repository.searchVideos("tiny desk").errorOrNull())
+        assertTrue(videos.queries.isEmpty(), "an unavailable provider must not be called")
+
+        // The user saves a key in Settings while the app is running.
+        availability = YouTubeAvailability.Available
+
+        assertTrue(repository.capabilities().isAvailable(dev.sonora.core.model.SearchProvider.YOUTUBE))
+        assertEquals(1, repository.searchVideos("tiny desk").getOrNull()?.size)
+        assertEquals(listOf("tiny desk"), videos.queries)
     }
 }

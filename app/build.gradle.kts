@@ -149,6 +149,8 @@ dependencies {
     implementation(libs.media3.common)
     implementation(libs.media3.session)
 
+    implementation(libs.youtube.iframe.player)
+
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 

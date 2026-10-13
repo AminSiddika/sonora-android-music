@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Only the DataStore folder is backed up: it holds favourites, the short
-    listening history and UI preferences. No credentials are ever stored, so
-    nothing sensitive can leak through a backup.
+    Favourites, history and preferences are small and worth restoring, so the
+    datastore folder is included. The secrets file that can hold a user supplied
+    YouTube API key is explicitly excluded: credentials stay on the device.
 -->
 <full-backup-content>
     <include
         domain="file"
         path="datastore/" />
+    <exclude
+        domain="file"
+        path="datastore/sonora_secrets.preferences_pb" />
 </full-backup-content>

@@ -23,7 +23,6 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,7 +75,7 @@ import dev.sonora.core.model.VideoItem
 @Composable
 fun SonoraApp(graph: SonoraGraph) {
     val navController = rememberNavController()
-    val playerViewModel = sonoraViewModel { container ->
+    val playerViewModel = sonoraViewModel(graph) { container ->
         PlayerViewModel(
             player = container.player,
             favoritesRepository = container.favoritesRepository,
@@ -103,220 +102,220 @@ fun SonoraApp(graph: SonoraGraph) {
         }
     }
 
-    CompositionLocalProvider(LocalSonoraGraph provides graph) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                val useNavigationRail = maxWidth >= 600.dp
+    Box(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val useNavigationRail = maxWidth >= 600.dp
 
-                val miniPlayer: @Composable () -> Unit = {
-                    AnimatedVisibility(
-                        visible = playerState.hasTrack && !showPlayer,
-                        enter = slideInVertically(animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM)),
-                        exit = slideOutVertically(animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM)),
-                    ) {
-                        MiniPlayer(
-                            state = playerState,
-                            onTogglePlay = playerViewModel::togglePlayPause,
-                            onNext = playerViewModel::next,
-                            onExpand = { showPlayer = true },
-                            onClose = playerViewModel::stop,
+            val miniPlayer: @Composable () -> Unit = {
+                AnimatedVisibility(
+                    visible = playerState.hasTrack && !showPlayer,
+                    enter = slideInVertically(animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM)),
+                    exit = slideOutVertically(animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM)),
+                ) {
+                    MiniPlayer(
+                        state = playerState,
+                        onTogglePlay = playerViewModel::togglePlayPause,
+                        onNext = playerViewModel::next,
+                        onExpand = { showPlayer = true },
+                        onClose = playerViewModel::stop,
+                    )
+                }
+            }
+
+            val navContent: @Composable (Modifier) -> Unit = { navModifier ->
+                NavHost(
+                    navController = navController,
+                    startDestination = HomeRoute,
+                    modifier = navModifier,
+                    enterTransition = { fadeIn(animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM)) },
+                    exitTransition = { fadeOut(animationSpec = motionSpec(reducedMotion, MotionDurations.SHORT)) },
+                    popEnterTransition = { fadeIn(animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM)) },
+                    popExitTransition = { fadeOut(animationSpec = motionSpec(reducedMotion, MotionDurations.SHORT)) },
+                ) {
+                    composable<HomeRoute> {
+                        val homeViewModel = sonoraViewModel(graph) { container ->
+                            HomeViewModel(
+                                searchRepository = container.searchRepository,
+                                favoritesRepository = container.favoritesRepository,
+                                recentlyPlayedRepository = container.recentlyPlayedRepository,
+                                catalogSession = container.catalogSession,
+                                isOnline = container.networkMonitor.isOnline,
+                            )
+                        }
+                        HomeScreen(
+                            viewModel = homeViewModel,
+                            favoriteIds = favoriteIds,
+                            currentTrackId = playerState.current?.id,
+                            isPlaying = playerState.isPlaying,
+                            onOpenTrack = { track -> navController.navigate(TrackDetailsRoute(track.id)) },
+                            onPlayTrack = playerViewModel::play,
+                            onToggleFavorite = playerViewModel::toggleFavorite,
+                            onQuickSearch = { term ->
+                                selectedTab = SonoraTab.SEARCH
+                                navController.navigate(SearchRoute(term)) { launchSingleTop = true }
+                            },
+                        )
+                    }
+
+                    composable<SearchRoute> { entry ->
+                        val route = entry.toRoute<SearchRoute>()
+                        val searchViewModel = sonoraViewModel(graph) { container ->
+                            SearchViewModel(
+                                searchRepository = container.searchRepository,
+                                favoritesRepository = container.favoritesRepository,
+                                preferences = container.preferences,
+                                catalogSession = container.catalogSession,
+                                isOnline = container.networkMonitor.isOnline,
+                                youTubeKey = container.youTubeKey,
+                            )
+                        }
+                        var appliedInitialQuery by rememberSaveable { mutableStateOf(false) }
+                        if (!appliedInitialQuery && !route.initialQuery.isNullOrBlank()) {
+                            appliedInitialQuery = true
+                            searchViewModel.useQuickSearch(route.initialQuery)
+                        }
+                        SearchScreen(
+                            viewModel = searchViewModel,
+                            favoriteIds = favoriteIds,
+                            currentTrackId = playerState.current?.id,
+                            isPlaying = playerState.isPlaying,
+                            onOpenTrack = { track -> navController.navigate(TrackDetailsRoute(track.id)) },
+                            onOpenVideo = { video -> navController.navigate(VideoDetailsRoute(video.videoId)) },
+                            onPlayTrack = playerViewModel::play,
+                            onToggleFavorite = playerViewModel::toggleFavorite,
+                            onWatchVideo = watchVideo,
+                            onOpenYouTubeGuide = { openUrl(dev.sonora.core.domain.ExternalLinks.YOUTUBE_API_KEY_GUIDE) },
+                        )
+                    }
+
+                    composable<FavoritesRoute> {
+                        val favoritesViewModel = sonoraViewModel(graph) { container ->
+                            FavoritesViewModel(container.favoritesRepository)
+                        }
+                        FavoritesScreen(
+                            viewModel = favoritesViewModel,
+                            currentTrackId = playerState.current?.id,
+                            isPlaying = playerState.isPlaying,
+                            onOpenTrack = { track -> navController.navigate(TrackDetailsRoute(track.id)) },
+                            onPlayTrack = playerViewModel::play,
+                            onRemove = { track -> favoritesViewModel.remove(track) },
+                        )
+                    }
+
+                    composable<SettingsRoute> {
+                        val settingsViewModel = sonoraViewModel(graph) { container ->
+                            SettingsViewModel(
+                                preferences = container.preferences,
+                                favoritesRepository = container.favoritesRepository,
+                                recentlyPlayedRepository = container.recentlyPlayedRepository,
+                                youTubeKeyStore = container.youTubeKeyStore,
+                                youTubeKey = container.youTubeKey,
+                                versionName = container.versionName,
+                            )
+                        }
+                        SettingsScreen(viewModel = settingsViewModel, onOpenUrl = openUrl)
+                    }
+
+                    composable<TrackDetailsRoute> { entry ->
+                        val route = entry.toRoute<TrackDetailsRoute>()
+                        val detailsViewModel = sonoraViewModel(graph, key = "track-${route.trackId}") { container ->
+                            TrackDetailsViewModel(
+                                trackId = route.trackId,
+                                catalogSession = container.catalogSession,
+                                favoritesRepository = container.favoritesRepository,
+                                recentlyPlayedRepository = container.recentlyPlayedRepository,
+                            )
+                        }
+                        TrackDetailsScreen(
+                            viewModel = detailsViewModel,
+                            isCurrentTrack = playerState.current?.id == route.trackId,
+                            isPlaying = playerState.isPlaying,
+                            isBuffering = playerState.isBuffering,
+                            onBack = { navController.popBackStack() },
+                            onPlay = { track -> playerViewModel.play(track) },
+                            onToggleFavorite = { playerViewModel.toggleFavorite(it) },
+                            onOpenStore = openUrl,
+                            onSearchAgain = {
+                                navController.popBackStack()
+                                selectedTab = SonoraTab.SEARCH
+                                navController.navigate(SearchRoute()) { launchSingleTop = true }
+                            },
+                        )
+                    }
+
+                    composable<VideoDetailsRoute> { entry ->
+                        val route = entry.toRoute<VideoDetailsRoute>()
+                        val videoViewModel = sonoraViewModel(graph, key = "video-${route.videoId}") { container ->
+                            VideoDetailsViewModel(videoId = route.videoId, catalogSession = container.catalogSession)
+                        }
+                        VideoDetailsScreen(
+                            viewModel = videoViewModel,
+                            onBack = { navController.popBackStack() },
+                            onWatchOnYouTube = { videoId -> graph.youTubeLauncher.openVideo(videoId) },
+                            onOpenChannel = { channelId -> graph.youTubeLauncher.openChannel(channelId) },
+                            onOpenUrl = openUrl,
+                            onSearchAgain = {
+                                navController.popBackStack()
+                                selectedTab = SonoraTab.SEARCH
+                                navController.navigate(SearchRoute()) { launchSingleTop = true }
+                            },
                         )
                     }
                 }
-
-                val navContent: @Composable (Modifier) -> Unit = { navModifier ->
-                    NavHost(
-                        navController = navController,
-                        startDestination = HomeRoute,
-                        modifier = navModifier,
-                        enterTransition = { fadeIn(animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM)) },
-                        exitTransition = { fadeOut(animationSpec = motionSpec(reducedMotion, MotionDurations.SHORT)) },
-                        popEnterTransition = { fadeIn(animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM)) },
-                        popExitTransition = { fadeOut(animationSpec = motionSpec(reducedMotion, MotionDurations.SHORT)) },
-                    ) {
-                        composable<HomeRoute> {
-                            val homeViewModel = sonoraViewModel { container ->
-                                HomeViewModel(
-                                    searchRepository = container.searchRepository,
-                                    favoritesRepository = container.favoritesRepository,
-                                    recentlyPlayedRepository = container.recentlyPlayedRepository,
-                                    catalogSession = container.catalogSession,
-                                    isOnline = container.networkMonitor.isOnline,
-                                )
-                            }
-                            HomeScreen(
-                                viewModel = homeViewModel,
-                                favoriteIds = favoriteIds,
-                                currentTrackId = playerState.current?.id,
-                                isPlaying = playerState.isPlaying,
-                                onOpenTrack = { track -> navController.navigate(TrackDetailsRoute(track.id)) },
-                                onPlayTrack = playerViewModel::play,
-                                onToggleFavorite = playerViewModel::toggleFavorite,
-                                onQuickSearch = { term ->
-                                    selectedTab = SonoraTab.SEARCH
-                                    navController.navigate(SearchRoute(term)) { launchSingleTop = true }
-                                },
-                            )
-                        }
-
-                        composable<SearchRoute> { entry ->
-                            val route = entry.toRoute<SearchRoute>()
-                            val searchViewModel = sonoraViewModel { container ->
-                                SearchViewModel(
-                                    searchRepository = container.searchRepository,
-                                    favoritesRepository = container.favoritesRepository,
-                                    preferences = container.preferences,
-                                    catalogSession = container.catalogSession,
-                                    isOnline = container.networkMonitor.isOnline,
-                                )
-                            }
-                            var appliedInitialQuery by rememberSaveable { mutableStateOf(false) }
-                            if (!appliedInitialQuery && !route.initialQuery.isNullOrBlank()) {
-                                appliedInitialQuery = true
-                                searchViewModel.useQuickSearch(route.initialQuery)
-                            }
-                            SearchScreen(
-                                viewModel = searchViewModel,
-                                favoriteIds = favoriteIds,
-                                currentTrackId = playerState.current?.id,
-                                isPlaying = playerState.isPlaying,
-                                onOpenTrack = { track -> navController.navigate(TrackDetailsRoute(track.id)) },
-                                onOpenVideo = { video -> navController.navigate(VideoDetailsRoute(video.videoId)) },
-                                onPlayTrack = playerViewModel::play,
-                                onToggleFavorite = playerViewModel::toggleFavorite,
-                                onWatchVideo = watchVideo,
-                                onOpenYouTubeGuide = { openUrl(dev.sonora.core.domain.ExternalLinks.YOUTUBE_API_KEY_GUIDE) },
-                            )
-                        }
-
-                        composable<FavoritesRoute> {
-                            val favoritesViewModel = sonoraViewModel { container ->
-                                FavoritesViewModel(container.favoritesRepository)
-                            }
-                            FavoritesScreen(
-                                viewModel = favoritesViewModel,
-                                currentTrackId = playerState.current?.id,
-                                isPlaying = playerState.isPlaying,
-                                onOpenTrack = { track -> navController.navigate(TrackDetailsRoute(track.id)) },
-                                onPlayTrack = playerViewModel::play,
-                                onRemove = { track -> favoritesViewModel.remove(track) },
-                            )
-                        }
-
-                        composable<SettingsRoute> {
-                            val settingsViewModel = sonoraViewModel { container ->
-                                SettingsViewModel(
-                                    preferences = container.preferences,
-                                    favoritesRepository = container.favoritesRepository,
-                                    recentlyPlayedRepository = container.recentlyPlayedRepository,
-                                    youTubeAvailability = container.youTubeAvailability,
-                                    versionName = container.versionName,
-                                )
-                            }
-                            SettingsScreen(viewModel = settingsViewModel, onOpenUrl = openUrl)
-                        }
-
-                        composable<TrackDetailsRoute> { entry ->
-                            val route = entry.toRoute<TrackDetailsRoute>()
-                            val detailsViewModel = sonoraViewModel(key = "track-${route.trackId}") { container ->
-                                TrackDetailsViewModel(
-                                    trackId = route.trackId,
-                                    catalogSession = container.catalogSession,
-                                    favoritesRepository = container.favoritesRepository,
-                                    recentlyPlayedRepository = container.recentlyPlayedRepository,
-                                )
-                            }
-                            TrackDetailsScreen(
-                                viewModel = detailsViewModel,
-                                isCurrentTrack = playerState.current?.id == route.trackId,
-                                isPlaying = playerState.isPlaying,
-                                isBuffering = playerState.isBuffering,
-                                onBack = { navController.popBackStack() },
-                                onPlay = { track -> playerViewModel.play(track) },
-                                onToggleFavorite = { playerViewModel.toggleFavorite(it) },
-                                onOpenStore = openUrl,
-                                onSearchAgain = {
-                                    navController.popBackStack()
-                                    selectedTab = SonoraTab.SEARCH
-                                    navController.navigate(SearchRoute()) { launchSingleTop = true }
-                                },
-                            )
-                        }
-
-                        composable<VideoDetailsRoute> { entry ->
-                            val route = entry.toRoute<VideoDetailsRoute>()
-                            val videoViewModel = sonoraViewModel(key = "video-${route.videoId}") { container ->
-                                VideoDetailsViewModel(videoId = route.videoId, catalogSession = container.catalogSession)
-                            }
-                            VideoDetailsScreen(
-                                viewModel = videoViewModel,
-                                onBack = { navController.popBackStack() },
-                                onWatchOnYouTube = { videoId -> graph.youTubeLauncher.openVideo(videoId) },
-                                onOpenChannel = { channelId -> graph.youTubeLauncher.openChannel(channelId) },
-                                onOpenUrl = openUrl,
-                                onSearchAgain = {
-                                    navController.popBackStack()
-                                    selectedTab = SonoraTab.SEARCH
-                                    navController.navigate(SearchRoute()) { launchSingleTop = true }
-                                },
-                            )
-                        }
-                    }
-                }
-
-                if (useNavigationRail) {
-                    Row(modifier = Modifier.fillMaxSize()) {
-                        SonoraNavigationRail(selected = selectedTab, onSelect = ::selectTab)
-                        Column(modifier = Modifier.fillMaxHeight()) {
-                            Box(modifier = Modifier.weight(1f)) {
-                                navContent(Modifier.fillMaxSize())
-                            }
-                            miniPlayer()
-                        }
-                    }
-                } else {
-                    Scaffold(
-                        bottomBar = {
-                            Column {
-                                miniPlayer()
-                                SonoraNavigationBar(selected = selectedTab, onSelect = ::selectTab)
-                            }
-                        },
-                    ) { innerPadding ->
-                        navContent(Modifier.fillMaxSize().padding(innerPadding))
-                    }
-                }
             }
 
-            AnimatedVisibility(
-                visible = showPlayer,
-                enter = slideInVertically(
-                    animationSpec = motionSpec(reducedMotion, MotionDurations.LONG),
-                    initialOffsetY = { fullHeight -> fullHeight },
-                ),
-                exit = slideOutVertically(
-                    animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM),
-                    targetOffsetY = { fullHeight -> fullHeight },
-                ),
-            ) {
-                PlayerScreen(
-                    state = playerState,
-                    isFavorite = playerState.current?.id in favoriteIds,
-                    onClose = { showPlayer = false },
-                    onTogglePlay = playerViewModel::togglePlayPause,
-                    onNext = playerViewModel::next,
-                    onPrevious = playerViewModel::previous,
-                    onSeekToProgress = playerViewModel::seekToProgress,
-                    onToggleShuffle = playerViewModel::toggleShuffle,
-                    onCycleRepeat = playerViewModel::cycleRepeatMode,
-                    onToggleFavorite = playerViewModel::toggleFavoriteOfCurrent,
-                    onOpenStore = openUrl,
-                )
+            if (useNavigationRail) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    SonoraNavigationRail(selected = selectedTab, onSelect = ::selectTab)
+                    Column(modifier = Modifier.fillMaxHeight()) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            navContent(Modifier.fillMaxSize())
+                        }
+                        miniPlayer()
+                    }
+                }
+            } else {
+                Scaffold(
+                    bottomBar = {
+                        Column {
+                            miniPlayer()
+                            SonoraNavigationBar(selected = selectedTab, onSelect = ::selectTab)
+                        }
+                    },
+                ) { innerPadding ->
+                    navContent(Modifier.fillMaxSize().padding(innerPadding))
+                }
             }
         }
 
-        BackHandler(enabled = showPlayer) { showPlayer = false }
+        AnimatedVisibility(
+            visible = showPlayer,
+            enter = slideInVertically(
+                animationSpec = motionSpec(reducedMotion, MotionDurations.LONG),
+                initialOffsetY = { fullHeight -> fullHeight },
+            ),
+            exit = slideOutVertically(
+                animationSpec = motionSpec(reducedMotion, MotionDurations.MEDIUM),
+                targetOffsetY = { fullHeight -> fullHeight },
+            ),
+        ) {
+            PlayerScreen(
+                state = playerState,
+                isFavorite = playerState.current?.id in favoriteIds,
+                onClose = { showPlayer = false },
+                onTogglePlay = playerViewModel::togglePlayPause,
+                onNext = playerViewModel::next,
+                onPrevious = playerViewModel::previous,
+                onSeekToProgress = playerViewModel::seekToProgress,
+                onToggleShuffle = playerViewModel::toggleShuffle,
+                onCycleRepeat = playerViewModel::cycleRepeatMode,
+                onToggleFavorite = playerViewModel::toggleFavoriteOfCurrent,
+                onOpenStore = openUrl,
+            )
+        }
     }
+
+        BackHandler(enabled = showPlayer) { showPlayer = false }
 }
 
 @Composable

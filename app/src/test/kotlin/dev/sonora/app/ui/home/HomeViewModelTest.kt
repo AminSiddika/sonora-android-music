@@ -70,7 +70,7 @@ class HomeViewModelTest {
         recent: FakeRecentlyPlayed = FakeRecentlyPlayed(),
         online: Boolean = true,
     ) = HomeViewModel(
-        searchRepository = SearchRepository(catalog, videos = null, youTubeAvailability = YouTubeAvailability.MissingKey),
+        searchRepository = SearchRepository(catalog, videos = null, youTubeAvailability = { YouTubeAvailability.MissingKey }),
         favoritesRepository = favorites,
         recentlyPlayedRepository = recent,
         catalogSession = CatalogSession(),

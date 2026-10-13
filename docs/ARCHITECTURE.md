@@ -91,11 +91,27 @@ missing item renders an explicit "Track unavailable" state.
 
 ### YouTube policy boundary
 
-The YouTube provider is intentionally limited to `search.list`. There is no ExoPlayer path for
-YouTube media, no `get_video_info`-style extraction, no player-API override, no background playback.
-`YouTubeLauncher` resolves `vnd.youtube:<id>` first and falls back to the HTTPS watch URL. The
-required attribution and policy links are rendered by the UI itself, and the same links are listed in
-the README.
+The YouTube provider is intentionally limited to `search.list`, and playback has exactly two routes:
+
+1. `YouTubeEmbedPlayer` (`androidyoutubeplayer`) mounts Google's **official IFrame Player API** in a
+   WebView. The video is cued, not autoplayed; the WebView player is bound to the Compose
+   lifecycle and released on dispose, so nothing plays in the background. YouTube serves the media,
+   the ads and the controls.
+2. `YouTubeLauncher` resolves `vnd.youtube:<id>` first and falls back to the HTTPS watch URL.
+
+There is no ExoPlayer path for YouTube media, no `get_video_info`-style extraction, no player-API
+override, no download and no background audio. The required attribution and policy links are rendered
+by the UI itself, and the same links are listed in the README.
+
+### Credentials
+
+`YouTubeKeyStore` keeps an optional user supplied API key in a dedicated DataStore file
+(`sonora_secrets.preferences_pb`) which the backup and device-transfer rules exclude, because
+credentials must not leave the device. `SonoraGraph` combines that value with the build-time key into
+a single `StateFlow<YouTubeKeyResolution>`, which drives both the repository's routing
+(`youTubeAvailability = { … }`) and the UI capabilities, so a key saved in Settings starts working
+without restarting the app. An OAuth client secret is a different credential and is never accepted
+here: public `search.list` calls need an API key, not a consent flow.
 
 ## Testing strategy
 

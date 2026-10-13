@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sonora's own data may be restored (favourites, history, preferences), but the
+    file that can contain a user supplied YouTube API key is never extracted.
+-->
 <data-extraction-rules>
     <cloud-backup>
         <include
             domain="file"
             path="datastore/" />
+        <exclude
+            domain="file"
+            path="datastore/sonora_secrets.preferences_pb" />
     </cloud-backup>
     <device-transfer>
         <include
             domain="file"
             path="datastore/" />
+        <exclude
+            domain="file"
+            path="datastore/sonora_secrets.preferences_pb" />
     </device-transfer>
 </data-extraction-rules>

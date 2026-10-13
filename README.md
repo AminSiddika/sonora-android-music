@@ -65,11 +65,15 @@ The catalogue experience works with **no API key, no account and no sign-in**.
   in a single DataStore Preferences file — no third-party database, no cloud sync.
 - Duplicate-safe favourite toggling, history capped at 12 entries, "clear history" action.
 
-**YouTube integration (optional)**
+**YouTube integration (optional, two independent routes)**
 
-- YouTube Data API v3 `search.list` for videos (title, channel, thumbnail, description).
-- Playback **only** through the official YouTube app (`vnd.youtube:` deep link) or the browser —
-  never in-app re-streaming, never background playback, never download, never ad interference.
+- **Search** — YouTube Data API v3 `search.list` (title, channel, thumbnail, description). Needs an
+  API key; the app runs catalogue-only without one.
+- **Playback in the app** — Google's **official IFrame Player API** embedded in a WebView
+  (`androidyoutubeplayer`), exactly what a browser would run. No API key, no stream extraction:
+  YouTube serves its own video, ads and controls, and playback stops when you leave the screen.
+- **Playback outside the app** — "Watch on YouTube" opens the official YouTube app (`vnd.youtube:`)
+  and falls back to the mobile website.
 - Required attribution and policy links (YouTube Terms of Service, Google Privacy Policy) surface in
   the UI.
 
@@ -205,13 +209,38 @@ explains how to enable it and offers a one-tap switch back to the catalogue.
    The value is injected through the AGP variant API as `BuildConfig.YOUTUBE_API_KEY`. It is never
    read from a tracked file, never logged, and `local.properties` is git-ignored.
 
-5. **GitHub Actions:** add a repository secret named `YOUTUBE_API_KEY`
+5. **Or paste it in the app (no rebuild):** Settings → *YouTube search* → paste the key → **Save key**.
+   The key is stored in this app's private DataStore file, is excluded from Android backup, and takes
+   precedence over a build-time key. **Remove key** deletes it again.
+
+6. **GitHub Actions:** add a repository secret named `YOUTUBE_API_KEY`
    (Settings → Secrets and variables → Actions → New repository secret). The workflow passes it to
    the build only for the assemble step. Without the secret, CI still builds and uploads the APK in
    catalogue-only mode.
 
 Placeholders such as `YOUR_API_KEY` are rejected by `YouTubeApiKey.sanitize`, so a copy-pasted
 template does not silently produce broken requests.
+
+### API key vs OAuth client secret
+
+A file named `client_secret_<project>-<id>.apps.googleusercontent.com.json` is a **Google OAuth 2.0
+installed-app client**, not an API key. It contains `client_id`, `client_secret` and `redirect_uris`
+and cannot call an API on its own: it only identifies the app during a browser consent flow that the
+account owner has to complete, after which the app receives an access token. For public, read-only
+`search.list` calls an **API key is the right credential** and needs no sign-in. If you own such a
+JSON file, create an API key in the *same* Google Cloud project instead
+(APIs & Services → Credentials → Create credentials → API key), and keep the OAuth client out of the
+repository.
+
+### Why Sonora does not use a stream extractor
+
+Popular open-source YouTube clients (for example RiPlay) combine two very different approaches:
+`androidyoutubeplayer` (the official IFrame player — the part Sonora uses for in-app playback) and a
+stream extractor such as NewPipeExtractor. Sonora intentionally does **not** use an extractor:
+resolving `googlevideo` stream URLs, proxying media, stripping ads or playing YouTube audio in the
+background violates the YouTube API Services Terms and the YouTube Terms of Service, breaks whenever
+Google rotates player ciphers, and would make this project's compliance claims untrue. If you need
+in-app playback, the embedded official player above gives it without touching any of that.
 
 ---
 

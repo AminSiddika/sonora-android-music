@@ -8,11 +8,14 @@ import dev.sonora.core.domain.FavoritesRepository
 import dev.sonora.core.domain.InMemoryFavoritesRepository
 import dev.sonora.core.domain.SearchRepository
 import dev.sonora.core.domain.VideoSearch
+import dev.sonora.core.domain.YouTubeApiKey
+import dev.sonora.core.domain.YouTubeKeyResolution
 import dev.sonora.core.model.ApiResult
 import dev.sonora.core.model.SearchProvider
 import dev.sonora.core.model.SonoraError
 import dev.sonora.core.model.Track
 import dev.sonora.core.model.VideoItem
+import dev.sonora.core.domain.YouTubeKeySource
 import dev.sonora.core.model.YouTubeAvailability
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -67,6 +70,32 @@ class SearchViewModelTest {
         }
     }
 
+    private class FakeVideoSearch(
+        private val result: ApiResult<List<VideoItem>> = ApiResult.Success(emptyList()),
+    ) : VideoSearch {
+        var calls = 0
+            private set
+
+        override suspend fun search(query: String, limit: Int): ApiResult<List<VideoItem>> {
+            calls++
+            return result
+        }
+    }
+
+    /**
+     * A single flow drives both the repository routing and the UI capabilities,
+     * exactly like the application graph does.
+     */
+    private fun resolution(availability: YouTubeAvailability): YouTubeKeyResolution = when (availability) {
+        YouTubeAvailability.Available -> YouTubeKeyResolution(
+            key = "AIzaSyRuntimeKey1234567890abcdefghij",
+            availability = availability,
+            source = YouTubeKeySource.RUNTIME,
+        )
+
+        else -> YouTubeKeyResolution(key = null, availability = availability, source = YouTubeKeySource.NONE)
+    }
+
     private fun viewModel(
         catalog: FakeCatalog = FakeCatalog(ApiResult.Success(listOf(track))),
         videos: VideoSearch? = null,
@@ -74,12 +103,14 @@ class SearchViewModelTest {
         favorites: FavoritesRepository = InMemoryFavoritesRepository(),
         preferences: FakeUserPreferences = FakeUserPreferences(),
         online: Boolean = true,
+        keyFlow: MutableStateFlow<YouTubeKeyResolution> = MutableStateFlow(resolution(availability)),
     ): SearchViewModel = SearchViewModel(
-        searchRepository = SearchRepository(catalog, videos, availability),
+        searchRepository = SearchRepository(catalog, videos) { keyFlow.value.availability },
         favoritesRepository = favorites,
         preferences = preferences,
         catalogSession = CatalogSession(),
         isOnline = MutableStateFlow(online),
+        youTubeKey = keyFlow,
     )
 
     @Test
@@ -225,5 +256,31 @@ class SearchViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf(track.id), favorites.favorites.first().map { it.id })
+    }
+
+    @Test
+    fun `saving a key at runtime enables youtube search immediately`() = runTest(dispatcher) {
+        val videos = FakeVideoSearch(
+            ApiResult.Success(listOf(VideoItem(videoId = "abc", title = "Tiny Desk", channelTitle = "NPR Music"))),
+        )
+        val keyFlow = MutableStateFlow(resolution(YouTubeAvailability.MissingKey))
+        val viewModel = viewModel(videos = videos, keyFlow = keyFlow)
+        advanceUntilIdle()
+
+        assertTrue(!viewModel.state.value.capabilities.isAvailable(SearchProvider.YOUTUBE))
+
+        // The user pastes a key in Settings while the app is running.
+        keyFlow.value = resolution(YouTubeAvailability.Available)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.capabilities.isAvailable(SearchProvider.YOUTUBE))
+        viewModel.onProviderSelected(SearchProvider.YOUTUBE)
+        viewModel.onQueryChange("tiny desk")
+        viewModel.submit()
+        advanceUntilIdle()
+
+        assertEquals(LoadStatus.CONTENT, viewModel.state.value.status)
+        assertEquals("abc", viewModel.state.value.videos.first().videoId)
+        assertEquals(1, videos.calls)
     }
 }

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
@@ -20,6 +22,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,7 +31,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -37,6 +44,7 @@ import dev.sonora.app.R
 import dev.sonora.app.data.ThemeMode
 import dev.sonora.app.ui.components.DisclosureCard
 import dev.sonora.core.domain.ExternalLinks
+import dev.sonora.core.domain.YouTubeKeySource
 import kotlinx.coroutines.delay
 
 /**
@@ -51,6 +59,7 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val keyboard = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(state.historyCleared) {
         if (state.historyCleared) {
@@ -141,12 +150,13 @@ fun SettingsScreen(
         }
 
         SettingsSection(title = stringResource(R.string.settings_youtube)) {
+            val key = state.youTubeKey
             AssistChip(
                 onClick = {},
                 enabled = false,
                 label = {
                     Text(
-                        text = if (state.youTubeAvailability.isAvailable) {
+                        text = if (key.availability.isAvailable) {
                             stringResource(R.string.settings_youtube_enabled)
                         } else {
                             stringResource(R.string.settings_youtube_missing)
@@ -162,14 +172,93 @@ fun SettingsScreen(
                 },
             )
             Text(
+                text = stringResource(
+                    when (key.source) {
+                        YouTubeKeySource.RUNTIME -> R.string.settings_youtube_key_source_runtime
+                        YouTubeKeySource.BUILD_CONFIG -> R.string.settings_youtube_key_source_build
+                        YouTubeKeySource.NONE -> R.string.settings_youtube_key_source_none
+                    },
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
                 text = stringResource(R.string.settings_youtube_summary),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+
+            OutlinedTextField(
+                value = state.keyInput,
+                onValueChange = viewModel::onKeyInputChange,
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                label = { Text(text = stringResource(R.string.settings_youtube_key_title)) },
+                placeholder = { Text(text = stringResource(R.string.settings_youtube_key_hint)) },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboard?.hide()
+                        viewModel.saveKey()
+                    },
+                ),
+            )
+
+            when (state.keyError) {
+                YouTubeKeyError.EMPTY -> Text(
+                    text = stringResource(R.string.settings_youtube_key_empty),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+
+                YouTubeKeyError.NOT_A_KEY -> Text(
+                    text = stringResource(R.string.settings_youtube_key_not_a_key),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+
+                null -> if (state.keySaved) {
+                    Text(
+                        text = stringResource(R.string.settings_youtube_key_saved),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = viewModel::saveKey) {
+                    Text(text = stringResource(R.string.settings_youtube_key_save))
+                }
+                OutlinedButton(
+                    onClick = viewModel::removeKey,
+                    enabled = key.source == YouTubeKeySource.RUNTIME,
+                ) {
+                    Text(text = stringResource(R.string.settings_youtube_key_remove))
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.settings_youtube_key_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
             DisclosureCard(
                 title = stringResource(R.string.attribution_youtube),
                 message = stringResource(R.string.settings_youtube_policy),
             )
+
+            Text(
+                text = stringResource(R.string.settings_youtube_oauth_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TextButton(onClick = { onOpenUrl(ExternalLinks.YOUTUBE_API_KEY_GUIDE) }) {
                     Text(text = stringResource(R.string.settings_youtube_setup))
