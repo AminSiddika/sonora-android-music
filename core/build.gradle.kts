@@ -17,8 +17,9 @@ kotlin {
 dependencies {
     api(libs.kotlinx.coroutines.core)
     api(libs.kotlinx.serialization.json)
+    // SonoraHttp.create() returns an HttpClient, so Ktor is part of this module's API surface.
+    api(libs.ktor.client.core)
 
-    implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
 
     testImplementation(libs.junit)

@@ -3,10 +3,10 @@ package dev.sonora.app.ui.player
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sonora.app.data.CatalogSession
-import dev.sonora.app.data.RecentlyPlayedRepository
 import dev.sonora.app.player.PlayerUiState
 import dev.sonora.app.player.SonoraPlayer
 import dev.sonora.core.domain.FavoritesRepository
+import dev.sonora.core.domain.RecentlyPlayedRepository
 import dev.sonora.core.model.Track
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
