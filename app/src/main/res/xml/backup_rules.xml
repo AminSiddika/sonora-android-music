@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Only the DataStore folder is backed up: it holds favourites, the short
+    listening history and UI preferences. No credentials are ever stored, so
+    nothing sensitive can leak through a backup.
+-->
+<full-backup-content>
+    <include
+        domain="file"
+        path="datastore/" />
+</full-backup-content>

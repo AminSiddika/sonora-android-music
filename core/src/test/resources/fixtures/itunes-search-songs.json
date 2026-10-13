@@ -1,0 +1,71 @@
+{
+  "resultCount": 5,
+  "results": [
+    {
+      "wrapperType": "track",
+      "kind": "song",
+      "artistId": 909253,
+      "collectionId": 1440857781,
+      "trackId": 1440857788,
+      "artistName": "Norah Jones",
+      "collectionName": "Come Away With Me",
+      "trackName": "Don't Know Why",
+      "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/1a/2b/3c/1a2b3c4d.m4a",
+      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/aa/bb/cc/dd.jpg/100x100bb.jpg",
+      "trackTimeMillis": 186000,
+      "primaryGenreName": "Jazz",
+      "releaseDate": "2002-02-26T08:00:00Z",
+      "trackViewUrl": "https://music.apple.com/us/album/dont-know-why/1440857781?i=1440857788",
+      "trackExplicitness": "notExplicit",
+      "contentAdvisoryRating": "Clean",
+      "country": "USA",
+      "isStreamable": true
+    },
+    {
+      "wrapperType": "track",
+      "kind": "song",
+      "collectionId": 1589885476,
+      "trackId": 1589885479,
+      "artistName": "An Ambient Composer",
+      "collectionName": "Long Form Pieces",
+      "trackName": "Untitled Drift",
+      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/11/22/33/44.png/100x100bb.png",
+      "trackTimeMillis": 601000,
+      "primaryGenreName": "Ambient",
+      "releaseDate": "2021-09-10T07:00:00Z",
+      "collectionViewUrl": "https://music.apple.com/us/album/untitled-drift/1589885476?i=1589885479",
+      "trackExplicitness": "notExplicit"
+    },
+    {
+      "wrapperType": "track",
+      "kind": "song",
+      "trackId": 2000000001,
+      "artistName": "The Loud Ones",
+      "collectionName": "Volume",
+      "trackName": "Turn It Up",
+      "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/55/66/77/556677.m4a",
+      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/ee/ff/00/112233.jpg/100x100bb.jpg",
+      "trackTimeMillis": 214000,
+      "primaryGenreName": "Rock",
+      "releaseDate": "2019-04-05T07:00:00Z",
+      "trackViewUrl": "https://music.apple.com/us/album/turn-it-up/2000000001?i=2000000001",
+      "trackExplicitness": "explicit",
+      "contentAdvisoryRating": "Explicit"
+    },
+    {
+      "wrapperType": "track",
+      "kind": "song",
+      "artistName": "Missing Track Id",
+      "collectionName": "Broken",
+      "trackName": "Should be skipped",
+      "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/aa/bb/cc/aabbcc.m4a"
+    },
+    {
+      "wrapperType": "collection",
+      "collectionId": 999,
+      "collectionName": "An Album Rather Than A Song",
+      "artistName": "Album Artist",
+      "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/22/33/44/556677.jpg/100x100bb.jpg"
+    }
+  ]
+}

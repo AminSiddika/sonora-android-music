@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sonora</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_favorites">Favourites</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Shared actions -->
+    <string name="action_retry">Try again</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_play">Play preview</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_next">Next</string>
+    <string name="action_previous">Previous</string>
+    <string name="action_repeat">Repeat mode: %1$s</string>
+    <string name="action_play_all">Play all</string>
+    <string name="action_open_store">Open in Apple Music</string>
+    <string name="action_watch_on_youtube">Watch on YouTube</string>
+    <string name="action_enable_youtube">How to enable YouTube search</string>
+    <string name="action_search_catalogue">Search the catalogue instead</string>
+
+    <!-- Search -->
+    <string name="search_hint">Songs, artists, albums</string>
+    <string name="search_source_label">Source</string>
+    <string name="search_provider_itunes">Catalogue</string>
+    <string name="search_provider_youtube">YouTube</string>
+    <string name="search_idle_title">Find your next favourite</string>
+    <string name="search_idle_message">Search the iTunes catalogue for songs with 30 second previews. Switch to YouTube for videos when a key is configured.</string>
+    <string name="search_empty_title">No matches</string>
+    <string name="search_empty_message">Nothing came back for “%1$s”. Try a shorter phrase or a different spelling.</string>
+    <string name="search_results_count">%1$d results</string>
+    <string name="search_quick_searches">Quick searches</string>
+
+    <!-- Discovery -->
+    <string name="home_subtitle">Previews you can play right now</string>
+    <string name="home_shelf_title">Today\'s shelf</string>
+    <string name="home_favorites_title">Your favourites</string>
+    <string name="home_recent_title">Jump back in</string>
+    <string name="home_browse_title">Browse moods &amp; genres</string>
+    <string name="home_empty_favorites">Tap a heart on any track and it will show up here.</string>
+    <string name="home_empty_recent">Previews you play will be listed here, even offline.</string>
+
+    <!-- Preview disclosure -->
+    <string name="preview_badge">Preview</string>
+    <string name="preview_badge_length">Preview • %1$s</string>
+    <string name="preview_unavailable">No preview</string>
+    <string name="preview_unavailable_detail">Apple does not provide a 30 second preview for this track, so it cannot be played here.</string>
+    <string name="disclosure_preview">Sonora plays the 30 second previews supplied by Apple\'s public iTunes Search API. It is not a full-track streaming service.</string>
+    <string name="disclosure_youtube">YouTube results are provided by the YouTube Data API. Playback continues in the official YouTube app or website, where YouTube\'s own ads and policies apply. Sonora never downloads or re-streams videos.</string>
+    <string name="attribution_itunes">Data and previews from the iTunes Search API</string>
+    <string name="attribution_youtube">Powered by YouTube</string>
+    <string name="badge_explicit">Explicit</string>
+
+    <!-- Errors -->
+    <string name="error_title_offline">You are offline</string>
+    <string name="error_message_offline">Sonora could not reach the network. Favourites and listening history still work without a connection.</string>
+    <string name="error_title_timeout">The request timed out</string>
+    <string name="error_message_timeout">The catalogue or YouTube took too long to answer. Retrying often helps on a slow connection.</string>
+    <string name="error_title_rate_limited">Slow down a moment</string>
+    <string name="error_message_rate_limited">The iTunes Search API allows about 20 requests per minute. Wait a few seconds and try again.</string>
+    <string name="error_title_missing_key">YouTube search needs an API key</string>
+    <string name="error_message_missing_key">Sonora works fully with the iTunes catalogue. To search YouTube as well, add a YouTube Data API v3 key through the local configuration described in the README.</string>
+    <string name="error_title_invalid_key">YouTube rejected the API key</string>
+    <string name="error_message_invalid_key">The configured key looks invalid or is restricted for this app. Check the key in Google Cloud Console, or keep using the catalogue.</string>
+    <string name="error_title_quota">YouTube quota exhausted</string>
+    <string name="error_message_quota">The daily YouTube Data API quota for this key is used up. Search the catalogue instead, or try again tomorrow.</string>
+    <string name="error_title_server">The provider had a problem</string>
+    <string name="error_message_server">The service answered with an error (HTTP %1$d). This is usually temporary.</string>
+    <string name="error_title_malformed">Unexpected response</string>
+    <string name="error_message_malformed">The response could not be read. The provider may have changed its format.</string>
+    <string name="error_title_empty_query">Type something to search</string>
+    <string name="error_message_empty_query">Enter an artist, song or album name first.</string>
+    <string name="error_title_unknown">Something went wrong</string>
+    <string name="error_message_unknown">Sonora hit an unexpected problem. Retrying is safe.</string>
+
+    <!-- Player -->
+    <string name="player_now_playing">Now playing</string>
+    <string name="player_repeat_off">Off</string>
+    <string name="player_repeat_all">All</string>
+    <string name="player_repeat_one">One</string>
+    <string name="player_error_network">This preview could not be downloaded. Check your connection and try again.</string>
+    <string name="player_error_unsupported">This preview cannot be played on this device.</string>
+    <string name="player_error_unknown">Playback stopped unexpectedly.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_title">Favourites</string>
+    <string name="favorites_count">%1$d saved</string>
+    <string name="favorites_empty_title">No favourites yet</string>
+    <string name="favorites_empty_message">Tap the heart on any track to keep it here. Favourites stay on this device.</string>
+
+    <!-- Track details -->
+    <string name="track_details_album">Album</string>
+    <string name="track_details_title">Track details</string>
+    <string name="track_details_genre">Genre</string>
+    <string name="track_details_released">Released</string>
+    <string name="track_details_length">Length</string>
+    <string name="track_details_source">Source</string>
+    <string name="track_missing_title">Track unavailable</string>
+    <string name="track_missing_message">This track is no longer in the current session. Search for it again to reopen its details.</string>
+    <string name="track_details_play">Play 30 second preview</string>
+
+    <!-- Video details -->
+    <string name="video_details_title">Video details</string>
+    <string name="video_details_channel">Channel</string>
+    <string name="video_details_published">Published</string>
+    <string name="video_details_playback_title">Where playback happens</string>
+    <string name="video_details_playback_message">Sonora never downloads or re-streams YouTube videos. Tapping watch opens the video in the official YouTube app, or in your browser when the app is not installed.</string>
+    <string name="video_details_open_channel">Open channel</string>
+    <string name="video_missing_title">Video unavailable</string>
+    <string name="video_missing_message">Run the search again to reopen this video\'s details.</string>
+    <string name="youtube_terms_label">YouTube Terms of Service</string>
+    <string name="youtube_privacy_label">Google Privacy Policy</string>
+
+    <!-- Settings -->
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_motion">Reduce motion</string>
+    <string name="settings_motion_summary">Disable screen transitions and animated flourishes</string>
+    <string name="settings_data">On this device</string>
+    <string name="settings_favorites_count">Favourites saved</string>
+    <string name="settings_history_count">Tracks in history</string>
+    <string name="settings_clear_history">Clear listening history</string>
+    <string name="settings_history_cleared">Listening history cleared</string>
+    <string name="settings_youtube">YouTube search</string>
+    <string name="settings_youtube_enabled">API key configured</string>
+    <string name="settings_youtube_missing">No API key configured</string>
+    <string name="settings_youtube_summary">The catalogue works without a key. A YouTube Data API v3 key only adds the optional video search provider.</string>
+    <string name="settings_youtube_policy">YouTube results follow the YouTube API Services Terms and Google Privacy Policy. Playback opens in the official YouTube experience.</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_message">Sonora is an offline-first music discovery demo built with Kotlin and Jetpack Compose. Catalogue data comes from Apple\'s public iTunes Search API.</string>
+    <string name="settings_privacy">Privacy</string>
+    <string name="settings_privacy_message">Searches go straight from this device to Apple and, when enabled, to Google. No account is required. Favourites, history and preferences stay in a private DataStore file on this device.</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="settings_itunes_docs">iTunes Search API documentation</string>
+    <string name="settings_youtube_setup">YouTube API key setup guide</string>
+    <string name="settings_youtube_terms">YouTube API Services Terms of Service</string>
+    <string name="settings_youtube_policies">YouTube Developer Policies</string>
+
+    <!-- Accessibility -->
+    <string name="cd_artwork">Artwork for %1$s</string>
+    <string name="cd_favorite_add">Add %1$s to favourites</string>
+    <string name="cd_favorite_remove">Remove %1$s from favourites</string>
+    <string name="cd_play_track">Play %1$s</string>
+    <string name="cd_now_playing">Now playing: %1$s</string>
+    <string name="cd_expand_player">Open the full player</string>
+    <string name="cd_close_player">Close the player</string>
+    <string name="cd_progress">Preview progress</string>
+    <string name="cd_offline_banner">Offline notice</string>
+    <string name="cd_youtube_video">YouTube video</string>
+    <string name="cd_loading">Loading</string>
+    <string name="cd_shuffle_enabled">Shuffle is on</string>
+    <string name="cd_shuffle_disabled">Shuffle is off</string>
+</resources>

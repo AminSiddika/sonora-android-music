@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches the Compose background so the launch frame does not flash. -->
+    <color name="sonora_window_background">#FCFAFF</color>
+    <color name="ic_launcher_background">#2A1F5C</color>
+</resources>

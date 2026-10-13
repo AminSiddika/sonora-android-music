@@ -1,0 +1,13 @@
+# Example of the untracked local.properties file.
+#
+# Do NOT commit the real file: it is ignored by .gitignore.
+#
+# Required by the Android Gradle plugin:
+#   sdk.dir=/path/to/Android/sdk
+#
+# Optional: a YouTube Data API v3 key used to enable the optional YouTube
+# search provider during local development. Without it Sonora runs in
+# catalog-only mode. The same value can be provided through the
+# YOUTUBE_API_KEY environment variable or -Pyoutube.api.key=<key>.
+#
+# youtube.api.key=YOUR_YOUTUBE_DATA_API_V3_KEY

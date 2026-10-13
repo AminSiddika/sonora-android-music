@@ -1,0 +1,45 @@
+{
+  "kind": "youtube#searchListResponse",
+  "etag": "etag-value",
+  "regionCode": "US",
+  "pageInfo": { "totalResults": 2, "resultsPerPage": 25 },
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "etag": "etag-1",
+      "id": { "kind": "youtube#video", "videoId": "dQw4w9WgXcQ" },
+      "snippet": {
+        "publishedAt": "2009-10-25T06:57:33Z",
+        "channelId": "UCuAXFkgsw1L7xaCfnd5JJOw",
+        "title": "Never Gonna Give You Up (Official Video)",
+        "description": "The official video for the song.",
+        "thumbnails": {
+          "default": { "url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg", "width": 120, "height": 90 },
+          "medium": { "url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg", "width": 320, "height": 180 },
+          "high": { "url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg", "width": 480, "height": 360 }
+        },
+        "channelTitle": "Rick Astley",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "etag-2",
+      "id": { "kind": "youtube#video", "videoId": "abcdefghijk" },
+      "snippet": {
+        "publishedAt": "2024-01-15T10:00:00Z",
+        "channelId": "UCSomeChannelId",
+        "title": "A Tiny Desk Concert",
+        "description": "Live session.",
+        "channelTitle": "NPR Music"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "etag-3",
+      "snippet": {
+        "title": "Item without a video id"
+      }
+    }
+  ]
+}
