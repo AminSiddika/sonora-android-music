@@ -3,7 +3,7 @@ package dev.sonora.app.data
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import dev.sonora.core.domain.ExternalLinks
 
 /**
@@ -17,7 +17,7 @@ import dev.sonora.core.domain.ExternalLinks
 class YouTubeLauncher(private val context: Context) {
 
     fun openVideo(videoId: String): Boolean {
-        val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse(ExternalLinks.youTubeAppUri(videoId)))
+        val appIntent = Intent(Intent.ACTION_VIEW, ExternalLinks.youTubeAppUri(videoId).toUri())
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (context.packageManager.resolveActivity(appIntent, 0) != null) {
             if (startSafely(appIntent)) return true
@@ -28,7 +28,7 @@ class YouTubeLauncher(private val context: Context) {
     fun openChannel(channelId: String): Boolean = openUrl(ExternalLinks.youTubeChannelUrl(channelId))
 
     fun openUrl(url: String): Boolean {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         return startSafely(intent)
     }
 

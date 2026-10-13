@@ -33,7 +33,6 @@
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.Sonora"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

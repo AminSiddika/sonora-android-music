@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -94,7 +94,7 @@ fun VideoRow(
 
         OutlinedButton(onClick = onWatchOnYouTube) {
             Icon(
-                imageVector = Icons.Filled.OpenInNew,
+                imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
             )
@@ -114,7 +114,7 @@ fun WatchOnYouTubeButton(
     modifier: Modifier = Modifier,
 ) {
     Button(onClick = onClick, modifier = modifier.fillMaxWidth()) {
-        Icon(imageVector = Icons.Filled.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
+        Icon(imageVector = Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
         Text(
             text = stringResource(R.string.action_watch_on_youtube),
             modifier = Modifier.padding(start = 8.dp),

@@ -32,8 +32,12 @@
     <string name="search_idle_message">Search the iTunes catalogue for songs with 30 second previews. Switch to YouTube for videos when a key is configured.</string>
     <string name="search_empty_title">No matches</string>
     <string name="search_empty_message">Nothing came back for “%1$s”. Try a shorter phrase or a different spelling.</string>
-    <string name="search_results_count">%1$d results</string>
     <string name="search_quick_searches">Quick searches</string>
+
+    <plurals name="search_results_count">
+        <item quantity="one">%1$d result</item>
+        <item quantity="other">%1$d results</item>
+    </plurals>
 
     <!-- Discovery -->
     <string name="home_subtitle">Previews you can play right now</string>
@@ -86,9 +90,13 @@
     <string name="player_error_unsupported">This preview cannot be played on this device.</string>
     <string name="player_error_unknown">Playback stopped unexpectedly.</string>
 
+    <plurals name="favorites_count">
+        <item quantity="one">%1$d saved</item>
+        <item quantity="other">%1$d saved</item>
+    </plurals>
+
     <!-- Favourites -->
     <string name="favorites_title">Favourites</string>
-    <string name="favorites_count">%1$d saved</string>
     <string name="favorites_empty_title">No favourites yet</string>
     <string name="favorites_empty_message">Tap the heart on any track to keep it here. Favourites stay on this device.</string>
 

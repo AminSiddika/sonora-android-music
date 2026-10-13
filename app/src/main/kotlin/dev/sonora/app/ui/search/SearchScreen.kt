@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -183,11 +184,9 @@ fun SearchScreen(
                 contentPadding = PaddingValues(bottom = 24.dp),
             ) {
                 item(key = "result-count") {
+                    val resultCount = if (provider == Provider.YOUTUBE) state.videos.size else state.tracks.size
                     Text(
-                        text = stringResource(
-                            R.string.search_results_count,
-                            if (provider == Provider.YOUTUBE) state.videos.size else state.tracks.size,
-                        ),
+                        text = pluralStringResource(R.plurals.search_results_count, resultCount, resultCount),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),

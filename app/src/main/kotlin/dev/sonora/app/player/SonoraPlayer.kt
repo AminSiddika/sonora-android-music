@@ -3,6 +3,7 @@ package dev.sonora.app.player
 import android.content.Context
 import android.content.Intent
 import android.app.PendingIntent
+import androidx.core.net.toUri
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -302,7 +303,7 @@ class SonoraPlayer(
                 .setTitle(title)
                 .setArtist(artist)
                 .setAlbumTitle(album)
-                .setArtworkUri(displayArtworkUrl?.let { android.net.Uri.parse(it) })
+                .setArtworkUri(displayArtworkUrl?.toUri())
                 .build(),
         )
         .build()

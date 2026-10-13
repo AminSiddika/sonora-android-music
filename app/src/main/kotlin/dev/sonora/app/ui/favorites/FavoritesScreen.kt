@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -67,7 +68,7 @@ fun FavoritesScreen(
                         modifier = Modifier.semantics { heading() },
                     )
                     Text(
-                        text = stringResource(R.string.favorites_count, state.favorites.size),
+                        text = pluralStringResource(R.plurals.favorites_count, state.favorites.size, state.favorites.size),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
