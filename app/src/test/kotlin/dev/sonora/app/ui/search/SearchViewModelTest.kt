@@ -105,7 +105,11 @@ class SearchViewModelTest {
         online: Boolean = true,
         keyFlow: MutableStateFlow<YouTubeKeyResolution> = MutableStateFlow(resolution(availability)),
     ): SearchViewModel = SearchViewModel(
-        searchRepository = SearchRepository(catalog, videos) { keyFlow.value.availability },
+        searchRepository = SearchRepository(
+            catalog = catalog,
+            videos = videos,
+            youTubeAvailability = { keyFlow.value.availability },
+        ),
         favoritesRepository = favorites,
         preferences = preferences,
         catalogSession = CatalogSession(),

@@ -15,10 +15,10 @@ import dev.sonora.core.model.YouTubeAvailability
 class SearchRepository(
     private val catalog: CatalogSearch,
     private val videos: VideoSearch?,
-    /** Evaluated on every call so a key entered at runtime is picked up immediately. */
-    private val youTubeAvailability: () -> YouTubeAvailability,
     private val cacheTtlMillis: Long = DEFAULT_CACHE_TTL_MILLIS,
     private val clock: () -> Long = System::currentTimeMillis,
+    /** Evaluated on every call so a key entered at runtime is picked up immediately. */
+    private val youTubeAvailability: () -> YouTubeAvailability,
 ) {
 
     private val trackCache = ExpiringCache<String, List<Track>>(
