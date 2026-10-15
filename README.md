@@ -316,6 +316,7 @@ Local unit tests (JVM, no emulator or SDK required):
 | `PlaybackQueueTest` | Next/previous wrap-around, repeat off/all/one, deterministic shuffle, removal, queue replacement |
 | `ExpiringCacheTest` | TTL expiry, LRU eviction, clearing |
 | `HttpErrorMapperTest` | Status/exception → typed error mapping |
+| `RuntimeYouTubeSearchTest` | Keyless behaviour, build-time key, a key saved at runtime, key removal, delegate reuse, `YouTubeApiKey.resolve` precedence |
 | `SearchQueryValidatorTest`, `ArtworkUrlsTest`, `DurationFormatTest`, `YouTubeApiKeyTest`, `ExternalLinksTest`, `FavoritesRepositoryTest` | Validation, URL rewriting, formatting, key sanitising, policy links, favourite toggling and serialization round-trip |
 
 App module (runs in CI with the Android SDK available):
@@ -325,6 +326,7 @@ App module (runs in CI with the Android SDK available):
 | `SearchViewModelTest` | Success, empty, error, blank query, YouTube missing-key path, provider switching and persistence, offline state, favourites |
 | `HomeViewModelTest` | Shelf rotation and load, shelf failure, favourites/history shelves, offline flag |
 | `PlayerUiStateTest` | Progress clamping, remaining time, active/queue flags, safe defaults |
+| `SettingsViewModelTest` | API key validation (valid/placeholder/empty), save and remove, YouTube status from the key flow, local data counters, appearance preferences |
 
 ---
 
@@ -372,12 +374,12 @@ All of the following were actually executed for this project:
 
 | Command | Result |
 | --- | --- |
-| `./gradlew :core:test` | **PASS** — 84 tests, 0 failures, 0 errors across 12 suites |
-| `./gradlew :app:testDebugUnitTest` | **PASS** — 21 tests, 0 failures (`SearchViewModelTest`, `HomeViewModelTest`, `PlayerUiStateTest`) |
+| `./gradlew :core:test` | **PASS** — 95 tests, 0 failures, 0 errors across 13 suites |
+| `./gradlew :app:testDebugUnitTest` | **PASS** — 30 tests, 0 failures (`SearchViewModelTest`, `HomeViewModelTest`, `PlayerUiStateTest`, `SettingsViewModelTest`) |
 | `./gradlew :app:lintDebug` | **PASS** with `abortOnError = true`; one advisory warning remains (`ObsoleteSdkInt` for the conventional `mipmap-anydpi-v26` adaptive-icon folder, kept deliberately) |
-| `./gradlew clean … :app:assembleDebug` | **PASS** — clean full build in 9m32s on an aarch64 host |
-| APK inspection | `app-debug.apk` (25.0 MiB) reports `package=dev.sonora.app.debug`, `minSdkVersion=26`, `targetSdkVersion=37`, `application-label='Sonora'`, multi-dex, no API key embedded |
-| GitHub Actions `Android CI` | **PASS** — run [#38367950422](https://github.com/AminSiddika/sonora-android-music/actions/runs/38367950422) uploads the `sonora-debug-apk` and `sonora-reports` artifacts |
+| `./gradlew :core:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug` | **PASS** — full local pipeline in 9m36s on an aarch64 Android/Termux host |
+| APK inspection | `app-debug.apk` (25.1 MiB) reports `package=dev.sonora.app.debug`, `minSdkVersion=26`, `targetSdkVersion=37`, `application-label='Sonora'`, multi-dex, no API key embedded |
+| GitHub Actions `Android CI` | **PASS** — run [#38691050149](https://github.com/AminSiddika/sonora-android-music/actions/runs/38691050149) uploads the `sonora-debug-apk` and `sonora-reports` artifacts |
 
 Verification was possible on an aarch64 Android/Termux host by extracting
 `platforms;android-37.0` and `build-tools;36.0.0` and pointing the build at the platform `aapt2`:

@@ -119,7 +119,6 @@
     <string name="video_details_playback_message">Sonora never downloads or re-streams YouTube videos. Tapping watch opens the video in the official YouTube app, or in your browser when the app is not installed.</string>
     <string name="video_details_play_here">Play here (official player)</string>
     <string name="video_details_embedded_message">Playback uses Google\'s official IFrame Player embedded in a WebView. YouTube serves its own video, ads and controls, playback stops when you leave this screen, and nothing is downloaded or re-streamed.</string>
-    <string name="video_details_embedded_title">Official embedded player</string>
     <string name="video_details_open_channel">Open channel</string>
     <string name="video_missing_title">Video unavailable</string>
     <string name="video_missing_message">Run the search again to reopen this video\'s details.</string>
